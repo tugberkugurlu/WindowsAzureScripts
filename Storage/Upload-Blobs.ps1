@@ -19,7 +19,7 @@ param(
 [System.Reflection.Assembly]::LoadWithPartialName("System.Web") | Out-Null
 $container = Get-AzureStorageContainer -Name $containerName -Verbose
 
-Get-ChildItem -Path $directory -File | foreach {
+Get-ChildItem -Path $directoryPath -File | foreach {
     
     $props = @{ 'ContentType' = [System.Web.MimeMapping]::GetMimeMapping($_.Name) }
     $container | Set-AzureStorageBlobContent -Properties $props -File $_.FullName -Verbose
