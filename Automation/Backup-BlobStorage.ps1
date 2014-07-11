@@ -23,7 +23,6 @@ workflow Backup-BlobStorage {
         ## Get storage account to take the blobs from and its context
         $storageAccountToTakeBackupFrom = Get-AzureStorageAccount -StorageAccountName $Using:StorageAccountNameToTakeBackupFrom
         $storageAccountToTakeBackupFromCreds = $storageAccountToTakeBackupFrom | Get-AzureStorageKey
-        Write-Output "Cred of $($Using:StorageAccountNameToTakeBackupFrom): $($storageAccountToTakeBackupFromCreds.Primary)"
         $storageAccountToTakeBackupFromCtx = New-AzureStorageContext `
             -StorageAccountName $Using:StorageAccountNameToTakeBackupFrom `
             -StorageAccountKey $storageAccountToTakeBackupFromCreds.Primary
@@ -31,7 +30,6 @@ workflow Backup-BlobStorage {
         ## Get storage account to take the blobs to
         $storageAccountToTakeBackupTo = Get-AzureStorageAccount -StorageAccountName $Using:StorageAccountNameToTakeBackupTo
         $storageAccountToTakeBackupToCreds = $storageAccountToTakeBackupTo | Get-AzureStorageKey
-        Write-Output "Cred of $($Using:StorageAccountNameToTakeBackupTo): $($storageAccountToTakeBackupToCreds.Primary)"
         $storageAccountToTakeBackupToCtx = New-AzureStorageContext `
             -StorageAccountName $StorageAccountNameToTakeBackupTo `
             -StorageAccountKey $storageAccountToTakeBackupToCreds.Primary
@@ -40,7 +38,6 @@ workflow Backup-BlobStorage {
 
             foreach {
 
-                Write-Output "$([Environment]::NewLine)"
                 Write-Output "=========== Container: $($_.Name) ==========="
                 Write-Output "Backup started for container '$($_.Name)' on storage account '$($_.StorageAccountName)'"
 
@@ -68,6 +65,9 @@ workflow Backup-BlobStorage {
                         Write-Output "Found blob '$($blob.Name)' inside container '$($_.Name)' on storage account $($_.StorageAccountName). Backup started for this blob."
                     }
                 }
+
+                Write-Output "Done processing container '$($_.Name)'"
+                Write-Output "$([Environment]::NewLine)"
             }
     }
 }
