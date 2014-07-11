@@ -31,7 +31,7 @@ workflow Backup-BlobStorage {
         $storageAccountToTakeBackupTo = Get-AzureStorageAccount -StorageAccountName $Using:StorageAccountNameToTakeBackupTo
         $storageAccountToTakeBackupToCreds = $storageAccountToTakeBackupTo | Get-AzureStorageKey
         $storageAccountToTakeBackupToCtx = New-AzureStorageContext `
-            -StorageAccountName $StorageAccountNameToTakeBackupTo `
+            -StorageAccountName $Using:StorageAccountNameToTakeBackupTo `
             -StorageAccountKey $storageAccountToTakeBackupToCreds.Primary
 
         $storageAccountToTakeBackupFromCtx | Get-AzureStorageContainer |
