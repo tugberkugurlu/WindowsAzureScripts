@@ -41,23 +41,16 @@ workflow Backup-BlobStorage {
                 Write-Output "=========== Container: $($_.Name) ==========="
                 Write-Output "Backup started for container '$($_.Name)' on storage account '$($_.StorageAccountName)'"
 
-                $blobs = $_ | Get-AzureStorageBlob -Context $storageAccountToTakeBackupFromCtx -MaxCount 10
-                $cToken = ($blobs | select -Last 1).ContinuationToken
+                $total = 0
+                $token = $null
 
-                Write-Output "Retrieved $($blobs.Length) blobs from container '$($_.Name)' on storage account '$($_.StorageAccountName)'"
-
-                ## process the first set of blobs here...
-                foreach($blob in $blobs)
+                do
                 {
-                    Write-Output "Found blob '$($blob.Name)' inside container '$($_.Name)' on storage account $($_.StorageAccountName). Backup started for this blob."
-                }
-
-                while($cToken -ne $null) {
-
-                    $nextBlobs = $_ | Get-AzureStorageBlob -Context $storageAccountToTakeBackupFromCtx -MaxCount 10 -ContinuationToken $cToken
-                    $cToken = ($nextBlobs | select -Last 1).ContinuationToken
+                    $blobs = $_ | Get-AzureStorageBlob -Context $storageAccountToTakeBackupFromCtx -MaxCount 10 -ContinuationToken $token
+                    $total += $blobs.Length
+                    $token = ($blobs | select -Last 1).ContinuationToken
                 
-                    Write-Output "Retrieved next $($nextBlobs.Length) blobs from container '$($_.Name)' on storage account '$($_.StorageAccountName)'"
+                    Write-Output "Retrieved next $($blobs.Length) blobs from container '$($_.Name)' on storage account '$($_.StorageAccountName)'"
 
                     ## process the first set of blobs here...
                     foreach($blob in $blobs)
@@ -65,6 +58,7 @@ workflow Backup-BlobStorage {
                         Write-Output "Found blob '$($blob.Name)' inside container '$($_.Name)' on storage account $($_.StorageAccountName). Backup started for this blob."
                     }
                 }
+                while($token -ne $null)
 
                 Write-Output "Done processing container '$($_.Name)'"
                 Write-Output "$([Environment]::NewLine)"
